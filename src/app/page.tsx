@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import {
   Zap,
@@ -13,6 +15,8 @@ import {
   Circle,
   Trash2,
   X,
+  Calendar,
+  LogOut,
 } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { NeonButton } from "@/components/ui/NeonButton";
@@ -144,16 +148,30 @@ export default function Dashboard() {
             <h1 className="text-3xl md:text-4xl font-bold text-glow">
               QuantumPlanner
             </h1>
-            <p className="text-[var(--text-secondary)] mt-1">
-              {getGreeting()}, {user.name}
+            <p className="text-[var(--text-secondary)] mt-1 flex items-center gap-2">
+              <Calendar size={16} />
+              {getGreeting()}, {user.name} • {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
             </p>
           </div>
-          <Link href="/focus">
-            <NeonButton variant="secondary" className="flex items-center gap-2">
-              <Timer size={18} />
-              Focus Void
+          <div className="flex items-center gap-3">
+            <Link href="/focus">
+              <NeonButton variant="secondary" className="flex items-center gap-2">
+                <Timer size={18} />
+                Focus Void
+              </NeonButton>
+            </Link>
+            <NeonButton
+              variant="ghost"
+              onClick={async () => {
+                const supabase = createClient();
+                await supabase.auth.signOut();
+                window.location.href = "/login";
+              }}
+              className="flex items-center gap-2"
+            >
+              <LogOut size={18} />
             </NeonButton>
-          </Link>
+          </div>
         </motion.div>
       </header>
 

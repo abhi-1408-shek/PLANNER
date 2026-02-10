@@ -1,0 +1,45 @@
+// Prisma schema for Multi-User Daily Planner with Supabase
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String   @id @default(cuid())
+  supabaseId        String   @unique
+  email             String   @unique
+  name              String
+  level             Int      @default(1)
+  xp                Int      @default(0)
+  xpToNextLevel     Int      @default(100)
+  energy            Int      @default(75)
+  totalFocusMinutes Int      @default(0)
+  streak            Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  tasks             Task[]
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  difficulty  String   // easy, medium, hard, epic
+  category    String   // work, health, learning, personal
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
